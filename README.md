@@ -56,7 +56,7 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
 1.  **Clone o Repositório**
 
     ```bash
-    git clone https://github.com/seu-usuario/seu-repositorio.git
+    git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/c4rlosfb/PHP-memory-game.git)
     cd seu-repositorio
     ```
 
