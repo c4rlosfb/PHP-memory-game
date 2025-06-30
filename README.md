@@ -4,7 +4,7 @@ Este é um projeto acadêmico/pessoal que implementa o clássico Jogo da Memóri
 
 O sistema conta com cadastro de usuários, login, modo de 1 e 2 jogadores, histórico de partidas e um ranking geral de jogadores.
 
-![Screenshot do Game](/assets/IMG/Screenshot.png)
+![Screenshot do Game](/assets/Screenshot.png)
 
 -----
 
