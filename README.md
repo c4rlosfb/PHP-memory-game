@@ -4,15 +4,7 @@ Este é um projeto acadêmico/pessoal que implementa o clássico Jogo da Memóri
 
 O sistema conta com cadastro de usuários, login, modo de 1 e 2 jogadores, histórico de partidas e um ranking geral de jogadores.
 
-![alt text](/public/IMG/image-8.png)
-![alt text](/public/IMG/image-9.png)
-![alt text](/public/IMG/image-10.png)
-![alt text](/public/IMG/image-11.png)
-![alt text](/public/IMG/image-12.png)
-![alt text](/public/IMG/image-14.png)
-![alt text](/public/IMG/image-15.png)
-![alt text](/public/IMG/image-16.png)
-![alt text](/public/IMG/image-17.png)
+![Screenshot do Game](/assets/IMG/Screenshot.png)
 
 -----
 
@@ -76,6 +68,9 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
 
 
     ```sql
+    CREATE DATABASE memory_game_db;
+    USE memory_game_db;
+
     -- Tabela de Usuários
     CREATE TABLE usuarios (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,10 +85,10 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
         id INT AUTO_INCREMENT PRIMARY KEY,
         usuario_id INT NOT NULL,
         data DATETIME DEFAULT CURRENT_TIMESTAMP,
-        tempo INT,
+        tempo INT, -- Tempo em segundos
         modo ENUM('1_jogador', '2_jogadores') NOT NULL,
-        vencedor VARCHAR(255),
-        pontos INT,
+        vencedor VARCHAR(255), -- Pode ser o nome do usuário ou 'Empate'/'Jogador 1'/'Jogador 2'
+        pontos INT, -- Pontuação do jogador (ou jogador 1 se for 2 jogadores)
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     );
 
@@ -102,11 +97,11 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
         usuario_id INT PRIMARY KEY,
         total_partidas INT DEFAULT 0,
         vitorias INT DEFAULT 0,
-        tempo_medio INT DEFAULT 0,
+        tempo_medio INT DEFAULT 0, -- Tempo médio em segundos para partidas ganhas
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     );
 
-    -- Gatilho (TRIGGER) para atualizar o ranking automaticamente
+    -- Cria o novo trigger com a lógica para derrotas e empates
     DELIMITER //
     CREATE TRIGGER after_partida_insert
     AFTER INSERT ON partidas
@@ -114,15 +109,31 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
     BEGIN
         DECLARE v_tempo_medio INT;
         DECLARE user_name_from_id VARCHAR(255);
+
+        -- Pega o nome do usuário que jogou (sempre o jogador 1)
         SELECT nome INTO user_name_from_id FROM usuarios WHERE id = NEW.usuario_id;
-        INSERT INTO ranking (usuario_id, total_partidas, vitorias)
-        VALUES (NEW.usuario_id, 1, IF(NEW.vencedor = user_name_from_id, 1, 0))
+
+        -- Tenta inserir um novo registro no ranking ou atualiza um existente
+        INSERT INTO ranking (usuario_id, total_partidas, vitorias, derrotas, empates)
+        VALUES (
+            NEW.usuario_id,
+            1,
+            IF(NEW.vencedor = user_name_from_id, 1, 0), -- Incrementa vitória se o vencedor for o jogador 1
+            IF(NEW.vencedor != user_name_from_id AND NEW.vencedor != 'Empate', 1, 0), -- Incrementa derrota se o vencedor NÃO for o jogador 1 e NÃO for empate
+            IF(NEW.vencedor = 'Empate', 1, 0) -- Incrementa empate se o resultado for 'Empate'
+        )
         ON DUPLICATE KEY UPDATE
             total_partidas = total_partidas + 1,
-            vitorias = vitorias + IF(NEW.vencedor = user_name_from_id, 1, 0);
+            vitorias = vitorias + IF(NEW.vencedor = user_name_from_id, 1, 0),
+            derrotas = derrotas + IF(NEW.vencedor != user_name_from_id AND NEW.vencedor != 'Empate', 1, 0),
+            empates = empates + IF(NEW.vencedor = 'Empate', 1, 0);
+
+        -- Recalcula o tempo médio APENAS para partidas que o usuário venceu
         SELECT AVG(tempo) INTO v_tempo_medio
         FROM partidas
         WHERE usuario_id = NEW.usuario_id AND vencedor = user_name_from_id;
+
+        -- Atualiza o tempo médio no ranking
         UPDATE ranking
         SET tempo_medio = IFNULL(v_tempo_medio, 0)
         WHERE usuario_id = NEW.usuario_id;
@@ -130,7 +141,6 @@ Siga os passos abaixo para rodar o projeto em seu ambiente local.
     //
     DELIMITER ;
     ```
-
 
 3.  **Configure a Conexão PHP**
 
@@ -166,14 +176,12 @@ Para uma visão geral do projeto e uma explicação detalhada do código e de se
 
 **[Clique aqui para assistir ao vídeo de apresentação do projeto](https://www.google.com/search?q=https://www.youtube.com/LINK_DO_SEU_VIDEO)**
 
-*(Lembre-se de gravar o vídeo, subi-lo no YouTube ou outra plataforma e substituir o link acima\!)*
-
 -----
 
 ## 👥 Participantes
 
 Este projeto foi desenvolvido com dedicação por:
 
-  * **[Carlos Felipe Barbosa]** - ([@c4rlosfb](https://github.com/c4rlosfb))
+  * **[Carlos Felipe Barbosa]** - ([@c4rlosfb](https://github.com/c4rlosfb)) 
   * **[Celso Augusto de Oliveira Junior]** - ([@Celso](https://github.com/celsohd21))
 
