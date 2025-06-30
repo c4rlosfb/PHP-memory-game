@@ -184,4 +184,9 @@ Este projeto foi desenvolvido com dedicação por:
 
   * **[Carlos Felipe Barbosa]** - ([@c4rlosfb](https://github.com/c4rlosfb)) 
   * **[Celso Augusto de Oliveira Junior]** - ([@Celso](https://github.com/celsohd21))
+---
+
+## 📝 Licença
+
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
